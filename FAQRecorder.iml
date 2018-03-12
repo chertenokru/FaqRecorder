@@ -53,5 +53,7 @@
     <orderEntry type="library" name="Maven: org.telegram:telegraph:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.telegram:telegraph-meta:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.xerial:sqlite-jdbc:3.20.1" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-jdk14:1.7.25" level="project" />
   </component>
 </module>

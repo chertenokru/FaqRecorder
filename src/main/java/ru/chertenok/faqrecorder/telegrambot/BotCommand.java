@@ -1,6 +1,8 @@
 package ru.chertenok.faqrecorder.telegrambot;
 
 import com.vdurmont.emoji.EmojiParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.objects.CallbackQuery;
@@ -16,7 +18,7 @@ import ru.chertenok.faqrecorder.telegraph.TextPublisher;
 import java.util.*;
 
 public class BotCommand extends AbstractBotCommand {
-
+    private static final Logger logger = LoggerFactory.getLogger(BotCommand.class);
     /**
      * Data interfaces to bd
      */
@@ -38,20 +40,25 @@ public class BotCommand extends AbstractBotCommand {
      * @return
      */
     public static BotCommand init(FaqDbDao faqDbDao, TextPublisher textPublisher) {
+
         BotCommand.faqDbDao = faqDbDao;
         BotCommand.textPublisher = textPublisher;
-
+        logger.info("Init telegram bot api...");
         ApiContextInitializer.init(); // Инициализируем апи
         TelegramBotsApi botapi = new TelegramBotsApi();
         try {
+            logger.debug("Create bot ...");
             BotCommand b = new BotCommand();
+            logger.debug("Registration bot ...");
             botapi.registerBot(b);
-//            moveRecordToTelegraph(224632793);
+            logger.debug("Registration bot ok");
             return b;
 
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+
+            logger.error("Bot registration error : ", e);
         }
+
         return null;
 
     }
@@ -64,10 +71,12 @@ public class BotCommand extends AbstractBotCommand {
     @Override
     protected void processMessage(Message msg) {
         //    if (msg.getChatId() == -1001197875491L) return;
+        if (logger.isDebugEnabled()) logger.debug("processing message...", msg);
 
         String txt = msg.getText();
         String[] text = txt.split(" ");
         String command = text[0].split("@")[0];
+        if (logger.isDebugEnabled()) logger.debug(command, msg);
 
 
         switch (command) {
@@ -76,7 +85,7 @@ public class BotCommand extends AbstractBotCommand {
                 break;
             }
             case "/help": {
-                helptCommand(msg);
+                helpCommand(msg);
                 break;
             }
             case "/add": {
@@ -116,53 +125,92 @@ public class BotCommand extends AbstractBotCommand {
         }
     }
 
-    private void helptCommand(Message msg) {
+    private void helpCommand(Message msg) {
         long chatId = msg.getChatId();
+        if (logger.isDebugEnabled())
+            logger.debug("/help chatID:" + chatId, msg);
+        if (logger.isInfoEnabled()) logger.info("/help chatID:" + chatId);
         sendMsg(chatId, Config.HELP_TEXT, null);
     }
 
     private void checkMultiCitationCommand(Message msg) {
         long chatId = msg.getChatId();
+        if (logger.isDebugEnabled())
+            logger.debug("long message chatID:" + chatId, msg);
         LongMessage longMessage = addList.get(chatId);
+        if (logger.isDebugEnabled())
+            logger.debug("long message is null?  chatID:" + chatId, longMessage);
         if (longMessage != null) {
+            if (logger.isDebugEnabled())
+                logger.debug("long message not null ", longMessage);
+
+
             if (msg.getForwardFrom() == null || longMessage.userID != msg.getFrom().getId()) {
                 addList.remove(chatId);
+                if (logger.isDebugEnabled())
+                    logger.debug("long message delete ", longMessage);
             } else {
                 longMessage.messages.add(msg.getText());
+                if (logger.isInfoEnabled()) logger.info("/LongMessage add text  chatID:" + chatId);
+                if (logger.isDebugEnabled())
+                    logger.debug("long message add text ", longMessage);
             }
         }
     }
 
     private void setupAsLinkCommand(Message msg, boolean b) {
         long chatId = msg.getChatId();
+        if (logger.isDebugEnabled())
+            logger.debug("/setupAsLinkCommand: " + (b ? "on" : "off") + " chatID:" + chatId, msg);
+        if (logger.isInfoEnabled()) logger.info("/setupAsLinkCommand: " + (b ? "on" : "off") + " chatID:" + chatId);
+
         try {
             ChatConfig config = faqDbDao.getChatConfigByID(chatId);
             config.isPublicInTelegraph = b;
             faqDbDao.setChatConfigByID(chatId, config);
             sendMsg(chatId, "Настройки изменены", null);
+            if (logger.isDebugEnabled())
+                logger.debug("/setupAsLinkCommand done   chatID:" + chatId, msg);
+
         } catch (Exception e) {
             sendMsg(chatId, "не удалось изменить настройки", null);
-            e.printStackTrace();
+            logger.error("Set setting error  chatID:" + chatId, msg);
         }
     }
 
     private void viewCommand(Message msg, String s1) {
-        String s = escapeHTML(faqDbDao.getMessageById(msg.getChatId(), Integer.valueOf((s1.split("@"))[0])));
+        long chatId = msg.getChatId();
+        if (logger.isDebugEnabled()) logger.debug("/list_xxx processing..., chatID:" + chatId, msg, s1);
+        if (logger.isInfoEnabled()) logger.info("/view_xxx: " + s1 + ", chatID:" + chatId);
+
+        String s = null;
+        try {
+            int recNo = Integer.valueOf(s1.split("@")[0]);
+            s = escapeHTML(faqDbDao.getMessageById(chatId, recNo));
+        } catch (Exception e) {
+            logger.error("Command view_xxx error, chatID:" + chatId, msg);
+        }
         if (s == null) {
             s = "<i>Такая запись не найдена</i>";
         }
         sendMsg(msg.getChatId(), s, null);
+        if (logger.isDebugEnabled()) logger.debug("Command view_xxx done, chatID:" + chatId, s);
     }
 
     private void listCommand(Message msg) {
-        Map<Integer, Map<String, String>> map = faqDbDao.getMessageListByCatId(msg.getChatId());
+        long chatId = msg.getChatId();
+        if (logger.isDebugEnabled()) logger.debug("/list processing..., chatID:" + chatId, msg);
+        if (logger.isInfoEnabled()) logger.info("/list, chatID:" + chatId);
+
+
+        Map<Integer, Map<String, String>> map = faqDbDao.getMessageListByCatId(chatId);
         //  Map<Integer, Map<String,String>> map = faqDbDao.getMessageListByCatId(-1001197875491L);
-        String s = EmojiParser.parseToUnicode(":books: <b>Сохранённые записи:</b>\n");
+
+        String s = EmojiParser.parseToUnicode(Config.LIST_TEXT);
         InlineKeyboardMarkup buttons = null;
         if (map != null) {
 
             for (Map.Entry<Integer, Map<String, String>> entry : map.entrySet()) {
-
                 Map<String, String> mapIn = entry.getValue();
                 if (Boolean.valueOf(mapIn.get("isLink"))) {
                     Map<String, String> maps = new HashMap<String, String>();
@@ -177,7 +225,7 @@ public class BotCommand extends AbstractBotCommand {
             s += "➖ Записей нет";
         }
 
-        sendMsg(msg.getChatId(), s, buttons);
+        sendMsg(chatId, s, buttons);
     }
 
     private void addCommand(Message msg) {
@@ -185,8 +233,13 @@ public class BotCommand extends AbstractBotCommand {
         String txt = msg.getText();
         String[] text = msg.getText().split(" ");
         long chatId = msg.getChatId();
+        if (logger.isDebugEnabled()) logger.debug("/add processing..., chatID:" + chatId, msg);
+        if (logger.isInfoEnabled()) logger.info("/add, chatID:" + chatId);
+
         // simple citation
         if (msg.getReplyToMessage() != null) {
+
+
             if (text.length == 1) {
                 title = "строка";
             } else {
@@ -194,20 +247,37 @@ public class BotCommand extends AbstractBotCommand {
                 title = String.copyValueOf(txt.toCharArray(), text[0].length(), txt.length() - text[0].length());
             }
 
-            String message;
+            String message = null;
             // get chat config
             ChatConfig chatConfig = faqDbDao.getChatConfigByID(chatId);
             if (chatConfig.isPublicInTelegraph) {
-                message = textPublisher.getUrl(Arrays.asList(msg.getReplyToMessage().getText()), title, msg.getReplyToMessage().getAuthorSignature());
-            } else
+                try {
+                    message = textPublisher.getUrl(Arrays.asList(msg.getReplyToMessage().getText()), title, msg.getReplyToMessage().getAuthorSignature());
+                    if (logger.isDebugEnabled()) logger.debug("/add url , chatID:" + chatId, message);
+                } catch (Exception e) {
+                    logger.error("Error telegra.ph posting, chatID:" + chatId, e, msg);
+                }
+            } else {
                 message = msg.getReplyToMessage().getText();
+                if (logger.isDebugEnabled()) logger.debug("/add text , chatID:" + chatId, message);
+            }
 
-            faqDbDao.addMessage(chatId, msg.getMessageId(), title, message, chatConfig.isPublicInTelegraph);
+            if (message != null) {
+                faqDbDao.addMessage(chatId, msg.getMessageId(), title, message, chatConfig.isPublicInTelegraph);
 
-            sendMsg(chatId, " Сохранено как <b>" + title + "</b>", null);
+                sendMsg(chatId, " Сохранено как <b>" + title + "</b>", null);
+                if (logger.isInfoEnabled()) logger.info("/add simple , chatID:" + chatId);
+            } else {
+                sendMsg(chatId, "<b> Сообщение не добавлено </b>", null);
+                if (logger.isDebugEnabled()) logger.debug("/add message is null..., chatID:" + chatId, msg);
+                if (logger.isInfoEnabled()) logger.info("/add, message is null! chatID:" + chatId);
+            }
+
         } else
         // multi citation ?
         {
+            if (logger.isDebugEnabled()) logger.debug("/add init multi citation..., chatID:" + chatId, msg);
+            if (logger.isInfoEnabled()) logger.info("/add, init multi citation! chatID:" + chatId);
             addList.remove(chatId);
             LongMessage longMessage = new LongMessage();
             longMessage.messages = new ArrayList<>();
@@ -223,20 +293,36 @@ public class BotCommand extends AbstractBotCommand {
 
     private void addDoneCommand(Message msg) {
         long chatId = msg.getChatId();
+        if (logger.isDebugEnabled()) logger.debug("/done , chatID:" + chatId, msg);
+        if (logger.isInfoEnabled()) logger.info("/done , chatID:" + chatId);
+
         LongMessage longMessage = addList.get(chatId);
         if (longMessage != null) {
             if (!longMessage.messages.isEmpty()) {
+                String message = null;
                 // get chat config
                 ChatConfig chatConfig = faqDbDao.getChatConfigByID(msg.getChatId());
-                String message;
                 if (chatConfig.isPublicInTelegraph) {
-                    message = textPublisher.getUrl(longMessage.messages, longMessage.title, msg.getAuthorSignature());
+                    try {
+                        message = textPublisher.getUrl(longMessage.messages, longMessage.title, msg.getAuthorSignature());
+                        if (logger.isDebugEnabled()) logger.debug("/add url , chatID:" + chatId, message);
+                    } catch (Exception e) {
+                        logger.error("Error telegra.ph posting, chatID:" + chatId, e, msg);
+                    }
                 } else
                     message = longMessage.messages.toString();
 
-                faqDbDao.addMessage(msg.getChatId(), msg.getMessageId(), longMessage.title, message, chatConfig.isPublicInTelegraph);
 
-                sendMsg(msg.getChatId(), " Сохранено как <b>" + longMessage.title + "</b>", null);
+                if (message != null) {
+                    faqDbDao.addMessage(chatId, msg.getMessageId(), longMessage.title, message, chatConfig.isPublicInTelegraph);
+
+                    sendMsg(chatId, " Сохранено как <b>" + longMessage.title + "</b>", null);
+                    if (logger.isInfoEnabled()) logger.info("/done multi citation , chatID:" + chatId);
+                } else {
+                    sendMsg(chatId, "<b> Сообщение не добавлено </b>", null);
+                    if (logger.isDebugEnabled()) logger.debug("/done, message is null..., chatID:" + chatId, msg);
+                    if (logger.isInfoEnabled()) logger.info("/done, message is null! chatID:" + chatId);
+                }
                 addList.remove(chatId);
             }
         }
@@ -244,15 +330,19 @@ public class BotCommand extends AbstractBotCommand {
     }
 
     private void startCommand(Message msg) {
-        String s = faqDbDao.getChatNameByID(msg.getChatId());
+        long chatId = msg.getChatId();
+        if (logger.isDebugEnabled()) logger.debug("/start, chatID:" + chatId, msg);
+        if (logger.isInfoEnabled()) logger.info("/start, chatID:" + chatId);
+
+        String s = faqDbDao.getChatNameByID(chatId);
 
         if (s != null) {
-            sendMsg(msg.getChatId(), getUserName(msg.getFrom()) + ", к чату " + msg.getChat().getTitle() + ", уже подключена записная книга - "
+            sendMsg(chatId, getUserName(msg.getFrom()) + ", к чату " + msg.getChat().getTitle() + ", уже подключена записная книга - "
                     + s, null);
         } else {
             s = "Памятка";
-            faqDbDao.addNewChat(msg.getChatId(), s);
-            sendMsg(msg.getChatId(), getUserName(msg.getFrom()) + ", к чату " + msg.getChat().getTitle() + ", подключена записная книга - "
+            faqDbDao.addNewChat(chatId, s);
+            sendMsg(chatId, getUserName(msg.getFrom()) + ", к чату " + msg.getChat().getTitle() + ", подключена записная книга - "
                     + s, null);
         }
     }
@@ -264,6 +354,9 @@ public class BotCommand extends AbstractBotCommand {
      */
     @Override
     protected void processNewUsers(Message message) {
+        long chatId = message.getChatId();
+        if (logger.isDebugEnabled()) logger.debug("new user, chatID:" + chatId, message);
+        if (logger.isInfoEnabled()) logger.info("new user, chatID:" + chatId);
 
         String users = "";
         for (User user : message.getNewChatMembers()) {
@@ -275,7 +368,7 @@ public class BotCommand extends AbstractBotCommand {
         }
 
         if (users.length() > 0) {
-            sendMsg(message.getChatId(), String.format(Config.WELCOME_MESSAGE, users), null);
+            sendMsg(chatId, String.format(Config.WELCOME_MESSAGE, users), null);
             listCommand(message);
         }
     }
@@ -287,10 +380,9 @@ public class BotCommand extends AbstractBotCommand {
      */
     @Override
     protected void processCallbackQuery(CallbackQuery callbackQuery) {
-
-        sendCallMsg(callbackQuery.getMessage().getChatId(), callbackQuery.getMessage().getMessageId(),
-                EmojiParser.parseToUnicode(callbackQuery.getFrom().getFirstName() + ", ну хватит кнопки жать :stuck_out_tongue_winking_eye:")
-                , null);
+//        sendCallMsg(callbackQuery.getMessage().getChatId(), callbackQuery.getMessage().getMessageId(),
+//                EmojiParser.parseToUnicode(callbackQuery.getFrom().getFirstName() + ", ну хватит кнопки жать :stuck_out_tongue_winking_eye:")
+//                , null);
 
     }
 

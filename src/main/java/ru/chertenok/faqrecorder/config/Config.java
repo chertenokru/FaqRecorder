@@ -1,5 +1,8 @@
 package ru.chertenok.faqrecorder.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -7,7 +10,7 @@ import java.util.logging.Level;
 
 // todo external setting file
 public class Config {
-
+    private static final Logger logger = LoggerFactory.getLogger(Config.class);
     public static final String PATH_TO_BD = "faq.db";
     public static final String BD_DRIVER_NAME = "org.sqlite.JDBC";
     public static final String CONNECT_TO_BD_STRING = "jdbc:sqlite:%s";
@@ -20,6 +23,7 @@ public class Config {
     public static final String TELEGRAM_LOGIN = "MessageRecorderBot";
 
     private static final Properties properties = new Properties();
+    public static final String LIST_TEXT = ":books: <b>Сохранённые записи:</b>\n";
     public static final String HELP_TEXT =
             "Этот бот умеет сохранять текстовые сообщения в БД или в виде публикаций telegra.ph \n\n"+
             " Список команд: \n"+
@@ -42,7 +46,8 @@ public class Config {
         try {
             properties.load(new FileInputStream("config.txt"));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("File config.txt with token for bot not found !!!", e);
+            throw new RuntimeException("File config.txt with token for bot not found !!!");
         }
 
     }
