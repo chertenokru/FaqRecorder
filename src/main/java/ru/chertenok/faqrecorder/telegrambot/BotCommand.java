@@ -75,6 +75,10 @@ public class BotCommand extends AbstractBotCommand {
                 startCommand(msg);
                 break;
             }
+            case "/help": {
+                helptCommand(msg);
+                break;
+            }
             case "/add": {
                 addCommand(msg);
                 break;
@@ -97,7 +101,7 @@ public class BotCommand extends AbstractBotCommand {
                 break;
             }
             default: {
-                String[] text1 = txt.split("_");
+                String[] text1 = command.split("_");
                 switch (text1[0]) {
                     case "/view": {
                         if (text1.length > 1) viewCommand(msg, text1[1]);
@@ -110,6 +114,11 @@ public class BotCommand extends AbstractBotCommand {
                 }
             }
         }
+    }
+
+    private void helptCommand(Message msg) {
+        long chatId = msg.getChatId();
+        sendMsg(chatId, Config.HELP_TEXT, null);
     }
 
     private void checkMultiCitationCommand(Message msg) {
@@ -138,7 +147,7 @@ public class BotCommand extends AbstractBotCommand {
     }
 
     private void viewCommand(Message msg, String s1) {
-        String s = faqDbDao.getMessageById(msg.getChatId(), Integer.valueOf((s1.split("@"))[0]));
+        String s = escapeHTML(faqDbDao.getMessageById(msg.getChatId(), Integer.valueOf((s1.split("@"))[0])));
         if (s == null) {
             s = "<i>Такая запись не найдена</i>";
         }

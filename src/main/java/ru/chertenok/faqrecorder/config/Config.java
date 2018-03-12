@@ -20,6 +20,20 @@ public class Config {
     public static final String TELEGRAM_LOGIN = "MessageRecorderBot";
 
     private static final Properties properties = new Properties();
+    public static final String HELP_TEXT =
+            "Этот бот умеет сохранять текстовые сообщения в БД или в виде публикаций telegra.ph \n\n"+
+            " Список команд: \n"+
+            " /start - начало работы \n"+
+            " /help - эта команда \n"+
+            " /list - список сохранённых сообщений \n"+
+            " /setup_MessageAsLink_on - сохранять сообщения в telegra.ph \n"+
+            " /setup_MessageAsLink_off - сохранять сообщения в БД \n"+
+            " /add описание - сохраняет цитируемое сообщение с указанным описанием.\n "+
+            "Для сохранения нескольких сообщений как одно, выделите их  " +
+            "и отправьте через команду переслать, добавив в описание add " +
+            "после этого, для нескольких сообщений, отправьте команду /done ";
+
+
     public static String WELCOME_MESSAGE = "%s, добро пожаловать в наш чат ! \n Ознакомься с основными документами.";
 
     static {

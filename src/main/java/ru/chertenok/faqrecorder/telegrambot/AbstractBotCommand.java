@@ -1,5 +1,6 @@
 package ru.chertenok.faqrecorder.telegrambot;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.CallbackQuery;
@@ -11,6 +12,7 @@ import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboar
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.chertenok.faqrecorder.config.Config;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,6 +135,15 @@ public abstract class AbstractBotCommand extends TelegramLongPollingBot {
                 (user.getFirstName() == null ? "" : user.getFirstName() + " ")
                 + (user.getLastName() == null ? "" : user.getLastName() + " ")
                 + (user.getUserName() == null ? "" : "@" + user.getUserName());
+    }
+
+
+    public String escapeHTML(String in)
+    {
+        String out  =  in.replaceAll("&","&amp;");
+        out =  out.replaceAll("\"", "&quot;");
+        out =  out.replaceAll("<","&lt;");
+        return  out.replaceAll(">","&gt;");
     }
 
 }
