@@ -14,6 +14,7 @@ public interface FaqDbDao {
 
     boolean addMessage(long chatId, int messageId, String name, String message, boolean isLink);
 
+
     boolean deleteMessageById(long chatId, int messageId);
 
     boolean renameMessageById(long chatId, int messageId, String newName);

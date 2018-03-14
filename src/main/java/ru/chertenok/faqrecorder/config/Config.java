@@ -16,7 +16,7 @@ public class Config {
     public static final String CONNECT_TO_BD_STRING = "jdbc:sqlite:%s";
     public static final String LOG_FILE_NAME = "server_log.txt";
     public static final int LOG_FILE_SIZE = 1024;
-    public static final Level LOG_GLOBAL_LEVEL = Level.INFO;
+    public static final Level LOG_GLOBAL_LEVEL = Level.ALL;
     public static final Level LOG_FILE_LEVEL = Level.ALL;
     public static final String TELEGRAPH_AUTHOR_ACC = "faq_message_recorder";
     public static final String TELEGRAPH_AUTHOR = "Messages Recorder";
@@ -32,6 +32,7 @@ public class Config {
             " /list - список сохранённых сообщений \n"+
             " /setup_MessageAsLink_on - сохранять сообщения в telegra.ph \n"+
             " /setup_MessageAsLink_off - сохранять сообщения в БД \n"+
+                    " /add_link ссылка описание - сохраняет ссылку с указанным описанием.\n " +
             " /add описание - сохраняет цитируемое сообщение с указанным описанием.\n "+
             "Для сохранения нескольких сообщений как одно, выделите их  " +
             "и отправьте через команду переслать, добавив  /add описание. " +
@@ -39,7 +40,10 @@ public class Config {
              "Если всё прошло хорошо, то Вы получите подтверждающее сообщение. ";
 
 
-    public static String WELCOME_MESSAGE = "%s, добро пожаловать в наш чат ! \n Ознакомься с основными документами.";
+    public static final String WELCOME_MESSAGE = "%s, добро пожаловать в наш чат ! \n Ознакомься с основными документами.";
+    public static final String START_MESSAGE = "%s, к чату %s, %s подключена записная книжка - %s  \n" +
+            " Используй команду /help чтобы узнать подробности";
+    public static final String BOOK_NAME_DEFAULT = "Памятка";
 
     static {
 

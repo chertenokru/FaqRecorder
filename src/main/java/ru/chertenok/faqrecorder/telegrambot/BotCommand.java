@@ -92,6 +92,10 @@ public class BotCommand extends AbstractBotCommand {
                 addCommand(msg);
                 break;
             }
+            case "/add_link": {
+                addLinkCommand(msg);
+                break;
+            }
             case "/done": {
                 addDoneCommand(msg);
                 break;
@@ -123,6 +127,34 @@ public class BotCommand extends AbstractBotCommand {
                 }
             }
         }
+    }
+
+    private void addLinkCommand(Message msg) {
+        String title;
+        String txt = msg.getText();
+        String[] text = msg.getText().split(" ");
+        long chatId = msg.getChatId();
+        if (logger.isDebugEnabled()) logger.debug("/add_link processing..., chatID:" + chatId, msg);
+        if (logger.isInfoEnabled()) logger.info("/add_link, chatID:" + chatId);
+
+        if (text.length > 2) {
+
+            String url = null;
+            url = text[1];
+            title = String.copyValueOf(txt.toCharArray(), text[0].length() + text[1].length() + 2, txt.length() - text[0].length() - text[1].length() - 2);
+
+            faqDbDao.addMessage(chatId, msg.getMessageId(), title, url, true);
+
+            sendMsg(chatId, " Сохранено как <b>" + title + "</b>", null);
+            if (logger.isInfoEnabled()) logger.info("/add_link , chatID:" + chatId);
+            if (logger.isDebugEnabled()) logger.debug("/add_link processing..., chatID:" + chatId, msg);
+        } else {
+            sendMsg(chatId, "<b> Сообщение не добавлено, используйте  /help чтобы узнать параметры  </b>", null);
+            if (logger.isDebugEnabled()) logger.debug("/add_link not param..., chatID:" + chatId, msg);
+            if (logger.isInfoEnabled()) logger.info("/add_link, not param! chatID:" + chatId);
+        }
+
+
     }
 
     private void helpCommand(Message msg) {
@@ -335,16 +367,26 @@ public class BotCommand extends AbstractBotCommand {
         if (logger.isInfoEnabled()) logger.info("/start, chatID:" + chatId);
 
         String s = faqDbDao.getChatNameByID(chatId);
+        String stat = "";
 
         if (s != null) {
-            sendMsg(chatId, getUserName(msg.getFrom()) + ", к чату " + msg.getChat().getTitle() + ", уже подключена записная книга - "
-                    + s, null);
+            stat = "уже ";
         } else {
-            s = "Памятка";
-            faqDbDao.addNewChat(chatId, s);
-            sendMsg(chatId, getUserName(msg.getFrom()) + ", к чату " + msg.getChat().getTitle() + ", подключена записная книга - "
-                    + s, null);
+            s = Config.BOOK_NAME_DEFAULT;
+            if (faqDbDao.addNewChat(chatId, s)) {
+                if (logger.isDebugEnabled()) logger.debug("/start, add chat done, chatID:" + chatId, msg);
+                if (logger.isInfoEnabled()) logger.info("/start, add chat done, chatID:" + chatId);
+
+            } else {
+                logger.error("/start chat not created bd error chatid:" + chatId, msg);
+            }
+
+
         }
+
+        sendMsg(chatId, String.format(Config.START_MESSAGE, getUserName(msg.getFrom()), msg.getChat().getTitle(), stat, s),
+                null);
+
     }
 
     /**
