@@ -1,4 +1,4 @@
-package ru.chertenok.faqrecorder.telegrambot;
+package faqrecorder.telegram;
 
 import com.vdurmont.emoji.EmojiParser;
 import org.slf4j.Logger;
@@ -10,10 +10,11 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.chertenok.faqrecorder.config.Config;
-import ru.chertenok.faqrecorder.dao.ChatConfig;
-import ru.chertenok.faqrecorder.dao.FaqDbDao;
-import ru.chertenok.faqrecorder.telegraph.TextPublisher;
+import ru.chertenok.telegrambot.AbstractBotCommand;
+import ru.chertenok.telegrambot.faqrecorder.config.Config;
+import ru.chertenok.telegrambot.faqrecorder.dao.ChatConfig;
+import ru.chertenok.telegrambot.faqrecorder.dao.FaqDbDao;
+import ru.chertenok.telegraph.TextPublisher;
 
 import java.util.*;
 
@@ -433,4 +434,18 @@ public class BotCommand extends AbstractBotCommand {
         public String title;
         public List<String> messages = new ArrayList<>();
     }
+
+
+    @Override
+    public String getBotUsername() {
+        return Config.TELEGRAM_LOGIN;
+    }
+
+
+    @Override
+    public String getBotToken() {
+        return Config.getTelegramToken();
+    }
+
+
 }

@@ -1,6 +1,5 @@
-package ru.chertenok.faqrecorder.telegrambot;
+package ru.chertenok.telegrambot;
 
-import org.apache.commons.codec.binary.StringUtils;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.CallbackQuery;
@@ -11,8 +10,6 @@ import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.chertenok.faqrecorder.config.Config;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,18 +17,6 @@ import java.util.Map;
 
 
 public abstract class AbstractBotCommand extends TelegramLongPollingBot {
-
-
-    @Override
-    public String getBotUsername() {
-        return Config.TELEGRAM_LOGIN;
-    }
-
-
-    @Override
-    public String getBotToken() {
-        return Config.getTelegramToken();
-    }
 
 
     /**
@@ -138,12 +123,11 @@ public abstract class AbstractBotCommand extends TelegramLongPollingBot {
     }
 
 
-    public String escapeHTML(String in)
-    {
-        String out  =  in.replaceAll("&","&amp;");
-        out =  out.replaceAll("\"", "&quot;");
-        out =  out.replaceAll("<","&lt;");
-        return  out.replaceAll(">","&gt;");
+    public String escapeHTML(String in) {
+        String out = in.replaceAll("&", "&amp;");
+        out = out.replaceAll("\"", "&quot;");
+        out = out.replaceAll("<", "&lt;");
+        return out.replaceAll(">", "&gt;");
     }
 
 }

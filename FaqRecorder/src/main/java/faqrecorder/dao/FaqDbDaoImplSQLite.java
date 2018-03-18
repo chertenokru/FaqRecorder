@@ -1,7 +1,7 @@
-package ru.chertenok.faqrecorder.dao;
+package faqrecorder.dao;
 
-import ru.chertenok.faqrecorder.config.Config;
-import ru.chertenok.faqrecorder.sqlite.BDHandler;
+import faqrecorder.config.Config;
+import ru.chertenok.bd.sqlite.BDHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

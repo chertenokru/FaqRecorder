@@ -1,12 +1,12 @@
-package ru.chertenok.faqrecorder;
+package faqrecorder;
 
+import faqrecorder.config.Config;
+import faqrecorder.dao.FaqDbDaoImplSQLite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.chertenok.faqrecorder.config.Config;
-import ru.chertenok.faqrecorder.dao.FaqDbDaoImplSQLite;
-import ru.chertenok.faqrecorder.telegrambot.BotCommand;
-import ru.chertenok.faqrecorder.telegraph.TelegraphPublisher;
-import ru.chertenok.faqrecorder.telegraph.TextPublisher;
+import ru.chertenok.telegrambot.telegrambot.BotCommand;
+import ru.chertenok.telegraph.TelegraphPublisher;
+import ru.chertenok.telegraph.TextPublisher;
 
 import java.io.IOException;
 import java.util.logging.FileHandler;

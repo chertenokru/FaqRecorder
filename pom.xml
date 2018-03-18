@@ -6,7 +6,7 @@
 
     <groupId>ru.chertenok.telegrambot</groupId>
     <artifactId>faqrecorder</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <build>
         <plugins>
@@ -25,7 +25,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>ru.chertenok.faqrecorder.Main</mainClass>
+                            <mainClass>Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -38,7 +38,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>ru.chertenok.faqrecorder.Main</mainClass>
+                            <mainClass>Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -54,6 +54,10 @@
             </plugin>
         </plugins>
     </build>
+    <modules>
+        <module>Common</module>
+        <module>FaqRecorder</module>
+    </modules>
 
     <dependencies>
         <dependency> <!--  telegrambots -->
@@ -93,13 +97,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <version>1.7.25</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-jdk14 -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-            <version>1.7.25</version>
-
         </dependency>
 
 

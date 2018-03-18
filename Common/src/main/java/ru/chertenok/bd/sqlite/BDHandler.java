@@ -1,4 +1,4 @@
-package ru.chertenok.faqrecorder.sqlite;
+package ru.chertenok.bd.sqlite;
 
 
 import java.sql.*;
