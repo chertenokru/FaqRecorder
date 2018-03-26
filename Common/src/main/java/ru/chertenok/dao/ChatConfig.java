@@ -1,4 +1,4 @@
-package faqrecorder.dao;
+package ru.chertenok.dao;
 
 public class ChatConfig {
     public long chatID;

@@ -1,8 +1,9 @@
-package faqrecorder.dao;
+package ru.chertenok.dao;
 
 import java.util.Map;
 
-public interface FaqDbDao {
+@Deprecated
+public interface DepricatedFaqDbDao {
     // return null if chat not exist
     String getChatNameByID(long chatId);
 

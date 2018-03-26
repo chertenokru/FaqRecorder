@@ -2,8 +2,6 @@ package faqrecorder.telegram;
 
 import com.vdurmont.emoji.EmojiParser;
 import faqrecorder.config.Config;
-import faqrecorder.dao.ChatConfig;
-import faqrecorder.dao.FaqDbDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.ApiContextInitializer;
@@ -13,6 +11,8 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.chertenok.dao.ChatConfig;
+import ru.chertenok.dao.DepricatedFaqDbDao;
 import ru.chertenok.telegrambot.AbstractBotCommand;
 import ru.chertenok.telegraph.TextPublisher;
 
@@ -23,7 +23,7 @@ public class BotCommand extends AbstractBotCommand {
     /**
      * Data interfaces to bd
      */
-    private static FaqDbDao faqDbDao;
+    private static DepricatedFaqDbDao faqDbDao;
     /**
      * interface to public service in web
      */
@@ -40,7 +40,7 @@ public class BotCommand extends AbstractBotCommand {
      * @param textPublisher
      * @return
      */
-    public static BotCommand init(FaqDbDao faqDbDao, TextPublisher textPublisher) {
+    public static BotCommand init(DepricatedFaqDbDao faqDbDao, TextPublisher textPublisher) {
 
         BotCommand.faqDbDao = faqDbDao;
         BotCommand.textPublisher = textPublisher;

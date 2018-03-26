@@ -7,8 +7,9 @@ import org.telegram.telegraph.api.methods.CreateAccount;
 import org.telegram.telegraph.api.methods.CreatePage;
 import org.telegram.telegraph.api.objects.*;
 import org.telegram.telegraph.exceptions.TelegraphException;
-import ru.chertenok.telegrambot.faqrecorder.config.Config;
-import ru.chertenok.telegrambot.faqrecorder.dao.FaqDbDao;
+import ru.chertenok.config.Config;
+import ru.chertenok.dao.DepricatedFaqDbDao;
+import ru.chertenok.dao.TelgraphDBDao;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -19,23 +20,23 @@ import java.util.Map;
 public class TelegraphPublisher implements TextPublisher {
     private String autor;
     private String token;
-    private FaqDbDao faqDbDao;
+    private DepricatedFaqDbDao faqDbDao;
 
-    public TelegraphPublisher(FaqDbDao faqDbDao) {
+    public TelegraphPublisher(TelgraphDBDao telgraphDBDao) {
         // Initialize context
         TelegraphContextInitializer.init();
         TelegraphContext.registerInstance(ExecutorOptions.class, new ExecutorOptions());
 
 
-        autor = faqDbDao.getAuthor();
-        token = faqDbDao.getToken();
+        autor = telgraphDBDao.getAuthor();
+        token = telgraphDBDao.getToken();
         if (autor == null) {
             // Create account
             try {
                 Account account = new CreateAccount(Config.TELEGRAPH_AUTHOR_ACC)
                         .setAuthorName(Config.TELEGRAPH_AUTHOR)
                         .execute();
-                faqDbDao.addAuthor(account.getShortName(), account.getAuthorName(), account.getAccessToken());
+                telgraphDBDao.addAuthor(account.getShortName(), account.getAuthorName(), account.getAccessToken());
                 autor = account.getAuthorName();
                 token = account.getAccessToken();
             } catch (TelegraphException e) {

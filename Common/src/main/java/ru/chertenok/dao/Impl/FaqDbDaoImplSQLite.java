@@ -1,4 +1,4 @@
-package faqrecorder.dao;
+package ru.chertenok.dao.Impl;
 
 import faqrecorder.config.Config;
 import ru.chertenok.bd.sqlite.BDHandler;
@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated
 public class FaqDbDaoImplSQLite implements DepricatedFaqDbDao {
 
 
