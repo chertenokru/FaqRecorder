@@ -1,6 +1,8 @@
 package ru.chertenok.faqrecorder.telegrambot;
 
 import com.vdurmont.emoji.EmojiParser;
+import org.apache.http.HttpHost;
+import org.apache.http.client.config.RequestConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.ApiContextInitializer;
@@ -9,6 +11,7 @@ import org.telegram.telegrambots.api.objects.CallbackQuery;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.chertenok.faqrecorder.config.Config;
 import ru.chertenok.faqrecorder.dao.ChatConfig;
@@ -32,6 +35,13 @@ public class BotCommand extends AbstractBotCommand {
      */
     private Map<Long, LongMessage> addList = new HashMap<>();
 
+    public BotCommand() {
+    }
+
+    public BotCommand(DefaultBotOptions options) {
+        super(options);
+    }
+
     /**
      * init and start bot
      *
@@ -46,9 +56,21 @@ public class BotCommand extends AbstractBotCommand {
         logger.info("Init telegram bot api...");
         ApiContextInitializer.init(); // Инициализируем апи
         TelegramBotsApi botapi = new TelegramBotsApi();
+
+
+        final RequestConfig.Builder configBuilder = RequestConfig.copy(RequestConfig.custom().build());
+        final int port = Integer.valueOf(Config.getProxyPort());
+        if ((Config.getProxyIP() != null) && port > 0) {
+            configBuilder.setProxy(new HttpHost(Config.getProxyIP(), port));
+        }
+
         try {
             logger.debug("Create bot ...");
-            BotCommand b = new BotCommand();
+
+            DefaultBotOptions options = new DefaultBotOptions();
+            options.setRequestConfig(configBuilder.build());
+            BotCommand b = new BotCommand(options);
+
             logger.debug("Registration bot ...");
             botapi.registerBot(b);
             logger.debug("Registration bot ok");

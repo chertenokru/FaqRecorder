@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class FaqDbDaoImplSQLite implements FaqDbDao {
 
@@ -157,9 +158,9 @@ public class FaqDbDaoImplSQLite implements FaqDbDao {
 
     @Override
     public Map<Integer, Map<String, String>> getMessageListByCatId(long chatId) {
-        Map<Integer, Map<String, String>> map = new HashMap<>();
+        Map<Integer, Map<String, String>> map = new TreeMap<>();
         try {
-            ResultSet rs = BDHandler.getResultSetFromSelect("select * from messages where chatid = ?", String.valueOf(chatId));
+            ResultSet rs = BDHandler.getResultSetFromSelect("select * from messages where chatid = ? order by id desc", String.valueOf(chatId));
             if (rs != null) {
                 while (rs.next()) {
                     Map<String, String> mapIn = new HashMap<>();

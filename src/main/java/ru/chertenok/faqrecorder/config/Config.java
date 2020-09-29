@@ -22,6 +22,7 @@ public class Config {
     public static final String TELEGRAPH_AUTHOR = "Messages Recorder";
     public static final String TELEGRAM_LOGIN = "MessageRecorderBot";
 
+
     private static final Properties properties = new Properties();
     public static final String LIST_TEXT = ":books: <b>Сохранённые записи:</b>\n";
     public static final String HELP_TEXT =
@@ -62,5 +63,21 @@ public class Config {
 
     public static String getTelegramToken() {
         return properties.getProperty("token");
+    }
+
+    public static String getProxyIP() {
+        return properties.getProperty("proxy_ip");
+    }
+
+    public static String getProxyPort() {
+        return properties.getProperty("proxy_port");
+    }
+
+    public static String getProxyUser() {
+        return properties.getProperty("proxy_user");
+    }
+
+    public static String getProxyPass() {
+        return properties.getProperty("proxy_pass");
     }
 }
