@@ -1,4 +1,4 @@
-package ru.chertenok.faqrecorder.dao;
+package faqrecorder.dao;
 
 import java.util.Map;
 

@@ -1,12 +1,13 @@
-package ru.chertenok.faqrecorder;
+package faqrecorder;
 
+import faqrecorder.config.Config;
+import faqrecorder.dao.FaqDbDao;
+import faqrecorder.dao.FaqDbDaoImplSQLite;
+import faqrecorder.telegram.BotCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.chertenok.faqrecorder.config.Config;
-import ru.chertenok.faqrecorder.dao.FaqDbDaoImplSQLite;
-import ru.chertenok.faqrecorder.telegrambot.BotCommand;
-import ru.chertenok.faqrecorder.telegraph.TelegraphPublisher;
-import ru.chertenok.faqrecorder.telegraph.TextPublisher;
+import ru.chertenok.telegraph.TelegraphPublisher;
+import ru.chertenok.telegraph.TextPublisher;
 
 import java.io.IOException;
 import java.util.logging.FileHandler;
@@ -45,7 +46,7 @@ public class Main {
         logger.info("Start App...");
         logger.info("DAO init start...");
         // bd init
-        FaqDbDaoImplSQLite faqDbDaoImplSQLite = new FaqDbDaoImplSQLite();
+        FaqDbDao faqDbDaoImplSQLite = new FaqDbDaoImplSQLite();
         logger.info("textPublisher init start...");
         // telegra.ph init
         TextPublisher textPublisher = new TelegraphPublisher(faqDbDaoImplSQLite);

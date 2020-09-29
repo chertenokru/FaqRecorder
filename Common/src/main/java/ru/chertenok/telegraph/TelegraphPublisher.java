@@ -1,4 +1,4 @@
-package ru.chertenok.faqrecorder.telegraph;
+package ru.chertenok.telegraph;
 
 import org.telegram.telegraph.ExecutorOptions;
 import org.telegram.telegraph.TelegraphContext;
@@ -7,8 +7,8 @@ import org.telegram.telegraph.api.methods.CreateAccount;
 import org.telegram.telegraph.api.methods.CreatePage;
 import org.telegram.telegraph.api.objects.*;
 import org.telegram.telegraph.exceptions.TelegraphException;
-import ru.chertenok.faqrecorder.config.Config;
-import ru.chertenok.faqrecorder.dao.FaqDbDao;
+import ru.chertenok.telegrambot.faqrecorder.config.Config;
+import ru.chertenok.telegrambot.faqrecorder.dao.FaqDbDao;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;

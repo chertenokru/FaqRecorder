@@ -1,4 +1,4 @@
-package ru.chertenok.faqrecorder.telegraph;
+package ru.chertenok.telegraph;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
